@@ -1,19 +1,34 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import * as Ably from "ably";
+import { AblyProvider, ChannelProvider } from "ably/react";
+import { createRoot } from "react-dom/client";
+import App from "./App";
+import "./index.css";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Admin from "./Admin";
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
+const container = document.getElementById("root")!;
+const root = createRoot(container);
+
+const client = new Ably.Realtime({
+  key: "UGWMYw.klSEdA:6n07eUckXZM10isiBvCH8fMxbHqddhRLPBw7LmnCbNw",
+  clientId: "2342343",
+});
+
+export default function Apps() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route index element={<App />} />
+        <Route path="admin" element={<Admin />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
 root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+  <AblyProvider client={client}>
+    <ChannelProvider channelName="realtime">
+      <Apps />
+    </ChannelProvider>
+  </AblyProvider>
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();

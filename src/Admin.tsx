@@ -4,11 +4,18 @@ import "./App.css";
 import { database } from "./lib/firebase";
 import { off, onValue, ref, set, update } from "firebase/database"; // Import database functions
 import { useChannel } from "ably/react";
-function App() {
-  const [updatedSec, setUpdateSec] = useState<any>(0);
+import * as Ably from "ably";
+// Create an Ably client instance with the provided API key.
+const client = new Ably.Rest({
+  key: "UGWMYw.klSEdA:6n07eUckXZM10isiBvCH8fMxbHqddhRLPBw7LmnCbNw",
+});
+
+// Get the Ably channel associated with football scores.
+const footballChannel = client.channels.get("realtime");
+
+function Admin() {
   const { channel } = useChannel("realtime", (message) => {
-    console.log("chUpdate", message.data.sec);
-    setUpdateSec(message.data.sec || 0);
+    console.log("chUpdate", message);
   });
 
   const videoUrl = "https://youtu.be/4yjkg8GxvBA";
@@ -47,17 +54,7 @@ function App() {
 
   const handleProgress = (state: any) => {
     if (!seeking) {
-      // Multiply by 100 to shift two decimal places to the left
-      let statePlayed = state.played * 100;
-      statePlayed = Math.floor(statePlayed);
-      let updatedSecc = updatedSec * 100;
-      updatedSecc = Math.floor(updatedSecc);
-
-      console.log("sec", statePlayed, updatedSecc);
-      if (updatedSecc !== statePlayed) {
-        playerRef.current.seekTo(updatedSec); // Convert milliseconds to seconds
-      }
-      // footballChannel.publish("seconds", { sec: state.played });
+      footballChannel.publish("seconds", { sec: state.played });
     }
   };
 
@@ -119,4 +116,4 @@ function App() {
   );
 }
 
-export default App;
+export default Admin;
