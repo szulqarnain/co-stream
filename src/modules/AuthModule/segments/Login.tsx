@@ -14,9 +14,8 @@ export default function Login() {
   // const redirectTo = `${baseUrl}/user`;
 
   const baseUrl = window.location.origin;
-  const redirectTo = `${baseUrl}/user`;
 
-  console.log("add", redirectTo);
+  console.log("add", baseUrl);
 
   const loginWithGoogle = () => {
     if (!isLoading) {
@@ -28,12 +27,12 @@ export default function Login() {
 
       // const redirectTo = `${baseUrl}/user`;
 
-      console.log("add", redirectTo);
+      console.log("add", baseUrl);
 
       nhost.auth.signIn({
         provider: "google",
         options: {
-          redirectTo: redirectTo,
+          redirectTo: baseUrl,
         },
       });
 
