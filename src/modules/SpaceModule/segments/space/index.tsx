@@ -12,7 +12,6 @@ export default function Space() {
   const [sec, setSec] = useState(0);
   const [seeking, setSeeking] = useState(false);
   const [playing, setPlaying] = useState(true);
-  const [pause, setPause] = useState(true);
   const [isOwner, setIsOwner] = useState(false);
   const [previousUpdate, setPreviousUpdate] = useState(0);
   const userId = useUserId();
@@ -37,20 +36,20 @@ export default function Space() {
       if (data?.spaces?.[0]?.user_id === userId) {
         setIsOwner(true);
       }
-      if (data?.spaces?.[0]?.pause) {
-        if (!isOwner) {
+      if (!isOwner) {
+        if (data?.spaces?.[0]?.pause) {
           setPlaying(false);
-        }
-      } else {
-        if (!isOwner) {
+        } else {
           setPlaying(true);
         }
       }
+      console.log("space", data?.spaces?.[0], playing);
     }
   }, [data]);
 
   const handleProgress = async (state: any) => {
     console.log("playing", state, playerRef);
+    playerRef.current?.player?.handlePlay();
     if (!seeking) {
       if (isOwner) {
         const res: any = await update({
@@ -63,12 +62,6 @@ export default function Space() {
           },
         });
       } else {
-        // if (state.played > sec) {
-        //   setPlaying(false);
-        // } else {
-        //   setPlaying(true);
-        // }
-        // // Multiply by 100 to shift two decimal places to the left
         const updatedSec = sec;
         let statePlayed = state.played * 100;
         statePlayed = Math.floor(statePlayed);
@@ -77,26 +70,12 @@ export default function Space() {
         console.log("sec", statePlayed, updatedSecc);
         if (updatedSecc !== statePlayed) {
           setPreviousUpdate(updatedSec);
-          playerRef.current.seekTo(updatedSec); // Convert milliseconds to seconds
-          //   if (previousUpdate === updatedSec) {
-          //     setPlaying(false);
-          //   }
+          playerRef.current.seekTo(updatedSec);
         }
       }
-      // Multiply by 100 to shift two decimal places to the left
-      //   let statePlayed = state.played * 100;
-      //   statePlayed = Math.floor(statePlayed);
-      //   let updatedSecc = updatedSec * 100;
-      //   updatedSecc = Math.floor(updatedSecc);
-      //   console.log("sec", statePlayed, updatedSecc);
-      //   if (updatedSecc !== statePlayed) {
-      //     playerRef.current.seekTo(updatedSec); // Convert milliseconds to seconds
-      //   }
-      // footballChannel.publish("seconds", { sec: state.played });
     }
   };
 
-  console.log("dataS", data);
   return (
     <div className="flex justify-center items-center">
       <div className="max-w-[600px] ">

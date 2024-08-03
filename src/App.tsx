@@ -8,6 +8,7 @@ import { loadErrorMessages, loadDevMessages } from "@apollo/client/dev";
 import Admin from "./Admin";
 import HomePage from "./pages/user/HomePage";
 import SpacePage from "./pages/user/SpacePage";
+import CreateSpacePage from "./pages/user/CreateSpacePage";
 
 // if (__DEV__) {
 // Adds messages only in a dev environment
@@ -23,6 +24,7 @@ function App() {
           <Route path="/user" element={<ProtectedRoute role="user" />}>
             <Route index element={<HomePage />} />
             <Route path="space/:id" element={<SpacePage />} />
+            <Route path="create" element={<CreateSpacePage />} />
             {/* <Route path="channels" element={<HomePage />} />
             <Route path="create" element={<Admin />} /> */}
           </Route>

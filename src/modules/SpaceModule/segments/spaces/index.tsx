@@ -19,7 +19,7 @@ export default function Spaces() {
         <div className="mt-2">
           {data?.spaces?.map((space: any) => {
             return (
-              <Link to={`/user/space/${space.id}`}>
+              <Link to={`/user/space/${space.id}`} className="mb-4 block">
                 <div
                   key={space.id}
                   className="flex h-[120px] w-full bg-[#7749b5] rounded-md cursor-pointer"

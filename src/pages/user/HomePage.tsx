@@ -1,10 +1,19 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import Spaces from "~/modules/SpaceModule/segments/spaces";
 
 export default function HomePage() {
   return (
     <div>
       <Spaces />
+      <div className="absolute bottom-0  flex justify-center w-full">
+        <Link
+          to="/user/create"
+          className="py-4 border border-1 border-[white] text-white rounded-lg px-4 mb-[40px]"
+        >
+          Create Your Space
+        </Link>
+      </div>
     </div>
   );
 }

@@ -40,3 +40,14 @@ export const UPDATE_MUTATION = gql`
     }
   }
 `;
+
+export const INSERT = gql`
+  mutation Add($data: [spaces_insert_input!]!) {
+    insert_spaces(objects: $data) {
+      affected_rows
+      returning {
+        id
+      }
+    }
+  }
+`;
