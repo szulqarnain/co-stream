@@ -1,15 +1,44 @@
 import React, { useState } from "react";
 import Logo from "~/assets/logo/logo.png";
 import { useSignInEmailPassword } from "@nhost/react";
+import { nhost } from "~/lib/nhost";
 
 export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
 
+  // const baseUrl =
+  //   process.env.ENV === "local"
+  //     ? "http://localhost:3000"
+  //     : "https://co-stream.vercel.app/";
+
+  // const redirectTo = `${baseUrl}/user`;
+
+  const baseUrl = window.location.origin;
+  const redirectTo = `${baseUrl}/user`;
+
+  console.log("add", redirectTo);
+
   const loginWithGoogle = () => {
     if (!isLoading) {
       setIsLoading(true);
-      window.location.href =
-        "https://aashcwcbrnqfgnvohxxi.auth.eu-central-1.nhost.run/v1/signin/provider/google";
+      // const baseUrl =
+      //   process.env.ENV === "local"
+      //     ? "http://localhost:3000"
+      //     : "https://co-stream.vercel.app/";
+
+      // const redirectTo = `${baseUrl}/user`;
+
+      console.log("add", redirectTo);
+
+      nhost.auth.signIn({
+        provider: "google",
+        options: {
+          redirectTo: redirectTo,
+        },
+      });
+
+      // window.location.href =
+      // "https://aashcwcbrnqfgnvohxxi.auth.eu-central-1.nhost.run/v1/signin/provider/google";
     }
   };
 
