@@ -10,7 +10,7 @@ export default function Spaces() {
   console.log("data", data);
   return (
     <div className="flex justify-center items-center">
-      <div className="min-w-[400px] ">
+      <div className="min-w-full p-4 sm:min-w-[400px] ">
         <div className="flex justify-center w-full mt-[30px]">
           <img src={Logo} alt="" className="h-[100px]" />
         </div>
@@ -24,7 +24,7 @@ export default function Spaces() {
                   key={space.id}
                   className="flex h-[120px] w-full bg-[#7749b5] rounded-md cursor-pointer"
                 >
-                  <div className="flex justify-center flex-col w-[30%] ">
+                  <div className="flex justify-center flex-col w-[130px] ">
                     <img src={Logo} alt="" className="h-full" />
                   </div>
                   <div>

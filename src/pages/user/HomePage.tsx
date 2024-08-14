@@ -6,7 +6,7 @@ export default function HomePage() {
   return (
     <div>
       <Spaces />
-      <div className="absolute bottom-0  flex justify-center w-full">
+      <div className=" bottom-0 fixed flex justify-center w-full bg-[#291248] pt-4">
         <Link
           to="/user/create"
           className="py-4 border border-1 border-[white] text-white rounded-lg px-4 mb-[40px]"

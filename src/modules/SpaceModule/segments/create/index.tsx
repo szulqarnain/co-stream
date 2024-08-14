@@ -65,7 +65,7 @@ export default function CreateSpace() {
   return (
     <div>
       <div className="flex justify-center items-center">
-        <div className="max-w-[600px] ">
+        <div className="max-w-full w-full sm:w-[inhret] sm:max-w-[600px] p-2 ">
           <div>
             <div className="flex justify-center w-full mt-[30px]">
               <img src={Logo} alt="" className="h-[100px]" />
@@ -74,7 +74,7 @@ export default function CreateSpace() {
             <div>
               <form
                 onSubmit={handleSubmit(onSubmit)}
-                className="flex flex-col gap-4 m-4 w-[500px]"
+                className="flex flex-col gap-4 m-0 sm:m-4 w-full sm:w-[500px]"
               >
                 <TextField
                   {...register("name", { required: true })}

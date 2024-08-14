@@ -96,6 +96,10 @@ export default function Space() {
     }
   };
 
+  const playPuase = () => {
+    setPlaying(!playing);
+  };
+
   console.log("dataS", data);
   return (
     <div className="flex justify-center items-center">
@@ -121,7 +125,12 @@ export default function Space() {
               </div>
 
               {!isOwner && (
-                <div className="absolute z-[9999] h-[400px] w-full top-0 bg-[transparent]"></div>
+                <div
+                  className="cursor-pointer absolute z-[9999] h-[400px] w-full top-0 bg-[transparent]"
+                  onClick={() => {
+                    playPuase();
+                  }}
+                ></div>
               )}
             </div>
           ) : (
