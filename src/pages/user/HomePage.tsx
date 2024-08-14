@@ -9,7 +9,7 @@ export default function HomePage() {
       <div className=" bottom-0 fixed flex justify-center w-full bg-[#291248] pt-4">
         <Link
           to="/user/create"
-          className="py-4 border border-1 border-[white] text-white rounded-lg px-4 mb-[40px]"
+          className="py-4 border border-1 border-[white] text-white rounded-lg px-4 mb-4 sm:mb-[40px]"
         >
           Create Space
         </Link>
