@@ -16,7 +16,7 @@ export default function Space() {
       updateMessages((prev: any) => [...prev, message]);
     } else {
       if (message.data.sec) {
-        setLink(vidUrl);
+        // setLink(vidUrl);
         const updatedSec = Math.floor(message.data.sec); // Use Math.floor to round down to the nearest whole number
         let dif = updatedSec - Math.floor(statePlayed);
         if (dif < 0) {
@@ -59,10 +59,10 @@ export default function Space() {
     if (data?.spaces && data?.spaces?.length > 0) {
       if (data?.spaces?.[0]?.link !== link) {
         setVidUrl(data?.spaces?.[0]?.link);
+        setLink(data?.spaces?.[0]?.link);
       }
       if (data?.spaces?.[0]?.user_id === userId) {
         setIsOwner(true);
-        setLink(data?.spaces?.[0]?.link);
       }
     }
   }, [data]);
