@@ -58,7 +58,6 @@ export default function Space() {
   useEffect(() => {
     if (data?.spaces && data?.spaces?.length > 0) {
       if (data?.spaces?.[0]?.link !== link) {
-        setVidUrl(data?.spaces?.[0]?.link);
         setLink(data?.spaces?.[0]?.link);
       }
       if (data?.spaces?.[0]?.user_id === userId) {

@@ -8,6 +8,8 @@ import { TextField } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { useUserId } from "@nhost/react";
 import { useNavigate } from "react-router-dom";
+import { apiCall } from "~/helpler/apiCall";
+import { getYouTubeVideoId } from "~/helpler/getVideoId";
 
 export default function CreateSpace() {
   const {
@@ -25,10 +27,24 @@ export default function CreateSpace() {
 
   const onSubmit = async (dataInput: any) => {
     setLoading(true);
+    const id = getYouTubeVideoId(dataInput.link);
+    if (!id) {
+      toast.error("Invalid Url");
+      setLoading(false);
+      return false;
+    }
+    const { title, thumbnail }: any = await apiCall(id);
+
+    if (!title) {
+      toast.error("Sorry! We're unable to get video detail try another link");
+      setLoading(false);
+      return false;
+    }
     let payload: any = {
       user_id,
-      name: dataInput?.name,
-      link: dataInput?.link,
+      name: title,
+      img: thumbnail,
+      link: `https://youtu.be/${id}`,
     };
 
     const response = await insert({
@@ -70,19 +86,12 @@ export default function CreateSpace() {
             <div className="flex justify-center w-full mt-[30px]">
               <img src={Logo} alt="" className="h-[100px]" />
             </div>
-            <h1 className="text-white font-bold">Create Space:</h1>
-            <div>
+            <h1 className="text-white font-bold text-center">Create Space</h1>
+            <div className="w-full flex justify-center items-center">
               <form
                 onSubmit={handleSubmit(onSubmit)}
                 className="flex flex-col gap-4 m-0 sm:m-4 w-full sm:w-[500px]"
               >
-                <TextField
-                  {...register("name", { required: true })}
-                  id="outlined-basic"
-                  label="Name"
-                  variant="outlined"
-                  sx={style}
-                />
                 <TextField
                   {...register("link", { required: true })}
                   id="outlined-basic"

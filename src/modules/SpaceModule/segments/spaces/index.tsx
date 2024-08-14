@@ -16,18 +16,18 @@ export default function Spaces() {
         </div>
         <h1 className="text-white font-bold">Spaces:</h1>
         {/* <hr /> */}
-        <div className="mt-2">
+        <div className="mt-2 mb-40">
           {data?.spaces?.map((space: any) => {
             return (
               <Link to={`/user/space/${space.id}`} className="mb-4 block">
                 <div
                   key={space.id}
-                  className="flex h-[120px] w-full bg-[#7749b5] rounded-md cursor-pointer"
+                  className="flex max-w-[400px] bg-[#7749b5] rounded-md cursor-pointer h-[150px]"
                 >
-                  <div className="flex justify-center flex-col w-[130px] ">
-                    <img src={Logo} alt="" className="h-full" />
+                  <div className="flex justify-center flex-col w-[200px] ">
+                    <img src={space.img} alt="" className="w-full" />
                   </div>
-                  <div>
+                  <div className="h-[120px] p-2 w-[200px]">
                     <h2 className="text-white mt-[5px]">{space.name}</h2>
                   </div>
                 </div>
