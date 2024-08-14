@@ -12,18 +12,15 @@ export default function Space() {
   const [messages, updateMessages] = useState<any>([]);
   const { channel, publish } = useChannel(id, (message: any) => {
     if (isOwner) {
-      console.log("messages", message);
+      // console.log("messages pub", message.data.sec);
       updateMessages((prev: any) => [...prev, message]);
     } else {
       if (message.data.sec) {
-        const updatedSec = message.data.sec;
-        let statePlayedFloor = Math.floor(statePlayed);
-        let updatedSecc = updatedSec * 100;
-        updatedSecc = Math.floor(updatedSecc);
-        console.log("sec", statePlayedFloor, updatedSecc);
-        if (updatedSecc !== statePlayedFloor) {
-          setPreviousUpdate(updatedSec);
-          playerRef.current.seekTo(updatedSec); // Convert milliseconds to seconds
+        const updatedSec = Math.floor(message.data.sec); // Use Math.floor to round down to the nearest whole number
+        console.log("messages sub", updatedSec);
+
+        if (updatedSec > Math.floor(statePlayed)) {
+          playerRef.current.seekTo(message.data.sec);
         }
       }
       if (message?.data?.pause) {
@@ -57,21 +54,9 @@ export default function Space() {
       if (data?.spaces?.[0]?.link !== link) {
         setLink(data?.spaces?.[0]?.link);
       }
-      // if (data?.spaces?.[0]?.sec !== sec) {
-      //   setSec(data?.spaces?.[0]?.sec);
-      // }
       if (data?.spaces?.[0]?.user_id === userId) {
         setIsOwner(true);
       }
-      // if (data?.spaces?.[0]?.pause) {
-      //   if (!isOwner) {
-      //     setPlaying(false);
-      //   }
-      // } else {
-      //   if (!isOwner) {
-      //     setPlaying(true);
-      //   }
-      // }
     }
   }, [data]);
 
@@ -79,15 +64,15 @@ export default function Space() {
     console.log("playing", state, playerRef);
 
     if (!seeking) {
-      let statePlayed = state.played * 100;
-      setStatePlayed(statePlayed);
+      const secondsPlayed = state.played * playerRef.current.getDuration();
+      setStatePlayed(secondsPlayed);
       if (isOwner) {
         const payload = {
-          sec: state.played,
+          sec: secondsPlayed,
           pause: !playerRef?.current?.player?.isPlaying || false,
         };
-
         publish("message", payload);
+        console.log("messages pub", Math.floor(secondsPlayed));
 
         const res: any = await update({
           variables: {
@@ -95,17 +80,6 @@ export default function Space() {
             data: payload,
           },
         });
-      } else {
-        // const updatedSec = sec;
-        // let statePlayed = state.played * 100;
-        // statePlayed = Math.floor(statePlayed);
-        // let updatedSecc = updatedSec * 100;
-        // updatedSecc = Math.floor(updatedSecc);
-        // console.log("sec", statePlayed, updatedSecc);
-        // if (updatedSecc !== statePlayed) {
-        //   setPreviousUpdate(updatedSec);
-        //   playerRef.current.seekTo(updatedSec); // Convert milliseconds to seconds
-        // }
       }
     }
   };
