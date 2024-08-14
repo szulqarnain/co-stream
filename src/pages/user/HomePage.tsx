@@ -11,7 +11,7 @@ export default function HomePage() {
           to="/user/create"
           className="py-4 border border-1 border-[white] text-white rounded-lg px-4 mb-[40px]"
         >
-          Create Your Space
+          Create Space
         </Link>
       </div>
     </div>
