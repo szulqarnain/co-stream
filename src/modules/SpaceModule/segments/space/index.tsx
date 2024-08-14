@@ -43,7 +43,7 @@ export default function Space() {
   const [playing, setPlaying] = useState(false);
   const [pause, setPause] = useState(true);
   const [isOwner, setIsOwner] = useState(false);
-  const [previousUpdate, setPreviousUpdate] = useState(0);
+  const [title, setTitle] = useState("");
   const userId = useUserId();
 
   const [update] = useMutation(UPDATE_MUTATION);
@@ -59,6 +59,7 @@ export default function Space() {
     if (data?.spaces && data?.spaces?.length > 0) {
       if (data?.spaces?.[0]?.link !== link) {
         setLink(data?.spaces?.[0]?.link);
+        setTitle(data?.spaces?.[0]?.name);
       }
       if (data?.spaces?.[0]?.user_id === userId) {
         setIsOwner(true);
@@ -104,7 +105,9 @@ export default function Space() {
               <img src={Logo} alt="" className="h-[100px]" />
             </Link>
           </div>
-          <h1 className="text-white font-bold">Space:</h1>
+          <h1 className="text-white font-bold w-[400px] mb-2 text-center">
+            {title}
+          </h1>
           {/* <hr /> */}
           {data?.spaces?.[0]?.link ? (
             <div className="mt-2 w-[400px] relative">
@@ -130,7 +133,9 @@ export default function Space() {
               )}
             </div>
           ) : (
-            <div>loading..</div>
+            <div className="mt-2 w-[400px] relative">
+              <div className=" animate-pulse cursor-pointer absolute z-[9999] h-[400px] w-full top-0  bg-[#7749b5]"></div>
+            </div>
           )}
         </div>
       </div>
