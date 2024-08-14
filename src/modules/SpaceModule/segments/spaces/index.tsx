@@ -12,7 +12,10 @@ export default function Spaces() {
     <div className="flex justify-center items-center">
       <div className="min-w-full p-4 sm:min-w-[400px] ">
         <div className="flex justify-center w-full mt-[30px]">
-          <img src={Logo} alt="" className="h-[100px]" />
+          <Link to={"/"}>
+            {" "}
+            <img src={Logo} alt="" className="h-[100px]" />{" "}
+          </Link>
         </div>
         <h1 className="text-white font-bold">Spaces:</h1>
         {/* <hr /> */}

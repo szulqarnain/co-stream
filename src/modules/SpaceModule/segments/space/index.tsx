@@ -100,7 +100,9 @@ export default function Space() {
       <div className="max-w-[600px] ">
         <div>
           <div className="flex justify-center w-full mt-[30px]">
-            <img src={Logo} alt="" className="h-[100px]" />
+            <Link to={"/"}>
+              <img src={Logo} alt="" className="h-[100px]" />
+            </Link>
           </div>
           <h1 className="text-white font-bold">Space:</h1>
           {/* <hr /> */}

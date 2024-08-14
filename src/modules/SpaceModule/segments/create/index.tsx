@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { TextField } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { useUserId } from "@nhost/react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { apiCall } from "~/helpler/apiCall";
 import { getYouTubeVideoId } from "~/helpler/getVideoId";
 
@@ -84,7 +84,10 @@ export default function CreateSpace() {
         <div className="max-w-full w-full sm:w-[inhret] sm:max-w-[600px] p-2 ">
           <div>
             <div className="flex justify-center w-full mt-[30px]">
-              <img src={Logo} alt="" className="h-[100px]" />
+              <Link to={"/"}>
+                {" "}
+                <img src={Logo} alt="" className="h-[100px]" />{" "}
+              </Link>
             </div>
             <h1 className="text-white font-bold text-center">Create Space</h1>
             <div className="w-full flex justify-center items-center">
