@@ -1,5 +1,5 @@
 import * as Ably from "ably";
-import { AblyProvider, ChannelProvider } from "ably/react";
+import { AblyProvider } from "ably/react";
 import App from "./App";
 import "./index.css";
 
@@ -48,9 +48,7 @@ root.render(
   <NhostProvider nhost={nhost}>
     <NhostApolloProvider nhost={nhost}>
       <AblyProvider client={client}>
-        <ChannelProvider channelName="realtime">
-          <App />
-        </ChannelProvider>
+        <App />
       </AblyProvider>
     </NhostApolloProvider>
     <Toaster />

@@ -6,10 +6,36 @@ import { GET_SPACE, UPDATE_MUTATION } from "~/graphql/spaces";
 import { Link } from "react-router-dom";
 import ReactPlayer from "react-player";
 import { useUserId } from "@nhost/react";
+import { useChannel } from "ably/react";
 export default function Space() {
   const { id }: any = useParams();
+  const [messages, updateMessages] = useState<any>([]);
+  const { channel, publish } = useChannel(id, (message: any) => {
+    if (isOwner) {
+      console.log("messages", message);
+      updateMessages((prev: any) => [...prev, message]);
+    } else {
+      if (message.data.sec) {
+        const updatedSec = message.data.sec;
+        let statePlayedFloor = Math.floor(statePlayed);
+        let updatedSecc = updatedSec * 100;
+        updatedSecc = Math.floor(updatedSecc);
+        console.log("sec", statePlayedFloor, updatedSecc);
+        if (updatedSecc !== statePlayedFloor) {
+          setPreviousUpdate(updatedSec);
+          playerRef.current.seekTo(updatedSec); // Convert milliseconds to seconds
+        }
+      }
+      if (message?.data?.pause) {
+        setPlaying(false);
+      } else {
+        setPlaying(true);
+      }
+    }
+  });
   const [link, setLink] = useState("");
   const [sec, setSec] = useState(0);
+  const [statePlayed, setStatePlayed] = useState(0);
   const [seeking, setSeeking] = useState(false);
   const [playing, setPlaying] = useState(true);
   const [pause, setPause] = useState(true);
@@ -31,68 +57,56 @@ export default function Space() {
       if (data?.spaces?.[0]?.link !== link) {
         setLink(data?.spaces?.[0]?.link);
       }
-      if (data?.spaces?.[0]?.sec !== sec) {
-        setSec(data?.spaces?.[0]?.sec);
-      }
+      // if (data?.spaces?.[0]?.sec !== sec) {
+      //   setSec(data?.spaces?.[0]?.sec);
+      // }
       if (data?.spaces?.[0]?.user_id === userId) {
         setIsOwner(true);
       }
-      if (data?.spaces?.[0]?.pause) {
-        if (!isOwner) {
-          setPlaying(false);
-        }
-      } else {
-        if (!isOwner) {
-          setPlaying(true);
-        }
-      }
+      // if (data?.spaces?.[0]?.pause) {
+      //   if (!isOwner) {
+      //     setPlaying(false);
+      //   }
+      // } else {
+      //   if (!isOwner) {
+      //     setPlaying(true);
+      //   }
+      // }
     }
   }, [data]);
 
   const handleProgress = async (state: any) => {
     console.log("playing", state, playerRef);
+
     if (!seeking) {
+      let statePlayed = state.played * 100;
+      setStatePlayed(statePlayed);
       if (isOwner) {
+        const payload = {
+          sec: state.played,
+          pause: !playerRef?.current?.player?.isPlaying || false,
+        };
+
+        publish("message", payload);
+
         const res: any = await update({
           variables: {
             id,
-            data: {
-              sec: state.played,
-              pause: !playerRef?.current?.player?.isPlaying || false,
-            },
+            data: payload,
           },
         });
       } else {
-        // if (state.played > sec) {
-        //   setPlaying(false);
-        // } else {
-        //   setPlaying(true);
+        // const updatedSec = sec;
+        // let statePlayed = state.played * 100;
+        // statePlayed = Math.floor(statePlayed);
+        // let updatedSecc = updatedSec * 100;
+        // updatedSecc = Math.floor(updatedSecc);
+        // console.log("sec", statePlayed, updatedSecc);
+        // if (updatedSecc !== statePlayed) {
+        //   setPreviousUpdate(updatedSec);
+        //   playerRef.current.seekTo(updatedSec); // Convert milliseconds to seconds
         // }
-        // // Multiply by 100 to shift two decimal places to the left
-        const updatedSec = sec;
-        let statePlayed = state.played * 100;
-        statePlayed = Math.floor(statePlayed);
-        let updatedSecc = updatedSec * 100;
-        updatedSecc = Math.floor(updatedSecc);
-        console.log("sec", statePlayed, updatedSecc);
-        if (updatedSecc !== statePlayed) {
-          setPreviousUpdate(updatedSec);
-          playerRef.current.seekTo(updatedSec); // Convert milliseconds to seconds
-          //   if (previousUpdate === updatedSec) {
-          //     setPlaying(false);
-          //   }
-        }
       }
-      // Multiply by 100 to shift two decimal places to the left
-      //   let statePlayed = state.played * 100;
-      //   statePlayed = Math.floor(statePlayed);
-      //   let updatedSecc = updatedSec * 100;
-      //   updatedSecc = Math.floor(updatedSecc);
-      //   console.log("sec", statePlayed, updatedSecc);
-      //   if (updatedSecc !== statePlayed) {
-      //     playerRef.current.seekTo(updatedSec); // Convert milliseconds to seconds
-      //   }
-      // footballChannel.publish("seconds", { sec: state.played });
     }
   };
 
