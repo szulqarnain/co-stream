@@ -19,7 +19,7 @@ export default function Space() {
         const updatedSec = Math.floor(message.data.sec); // Use Math.floor to round down to the nearest whole number
         console.log("messages sub", updatedSec);
 
-        if (updatedSec > Math.floor(statePlayed)) {
+        if (updatedSec !== Math.floor(statePlayed)) {
           playerRef.current.seekTo(message.data.sec);
         }
       }
