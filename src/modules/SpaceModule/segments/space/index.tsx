@@ -16,6 +16,7 @@ export default function Space() {
       updateMessages((prev: any) => [...prev, message]);
     } else {
       if (message.data.sec) {
+        setLink(vidUrl);
         const updatedSec = Math.floor(message.data.sec); // Use Math.floor to round down to the nearest whole number
         let dif = updatedSec - Math.floor(statePlayed);
         if (dif < 0) {
@@ -34,11 +35,12 @@ export default function Space() {
       }
     }
   });
+  const [vidUrl, setVidUrl] = useState("");
   const [link, setLink] = useState("");
   const [sec, setSec] = useState(0);
   const [statePlayed, setStatePlayed] = useState(0);
   const [seeking, setSeeking] = useState(false);
-  const [playing, setPlaying] = useState(true);
+  const [playing, setPlaying] = useState(false);
   const [pause, setPause] = useState(true);
   const [isOwner, setIsOwner] = useState(false);
   const [previousUpdate, setPreviousUpdate] = useState(0);
@@ -56,10 +58,11 @@ export default function Space() {
   useEffect(() => {
     if (data?.spaces && data?.spaces?.length > 0) {
       if (data?.spaces?.[0]?.link !== link) {
-        setLink(data?.spaces?.[0]?.link);
+        setVidUrl(data?.spaces?.[0]?.link);
       }
       if (data?.spaces?.[0]?.user_id === userId) {
         setIsOwner(true);
+        setLink(data?.spaces?.[0]?.link);
       }
     }
   }, [data]);
@@ -89,7 +92,7 @@ export default function Space() {
   };
 
   const playPuase = () => {
-    setPlaying(!playing);
+    setPlaying(true);
   };
 
   console.log("dataS", data);
