@@ -92,7 +92,7 @@ export default function Space() {
   };
 
   const playPuase = () => {
-    setPlaying(true);
+    setPlaying(!playing);
   };
 
   console.log("dataS", data);
