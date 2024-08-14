@@ -31,9 +31,9 @@ export default function Login() {
 
       nhost.auth.signIn({
         provider: "google",
-        options: {
-          redirectTo: baseUrl,
-        },
+        // options: {
+        //   redirectTo: baseUrl,
+        // },
       });
 
       // window.location.href =
