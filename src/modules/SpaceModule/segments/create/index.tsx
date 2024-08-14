@@ -95,8 +95,9 @@ export default function CreateSpace() {
                 <TextField
                   {...register("link", { required: true })}
                   id="outlined-basic"
-                  label="Link"
+                  label="Youtube Link"
                   variant="outlined"
+                  placeholder="Place youtube link here"
                   sx={style}
                 />
 
