@@ -17,9 +17,13 @@ export default function Space() {
     } else {
       if (message.data.sec) {
         const updatedSec = Math.floor(message.data.sec); // Use Math.floor to round down to the nearest whole number
-        console.log("messages sub", updatedSec);
+        let dif = updatedSec - Math.floor(statePlayed);
+        if (dif < 0) {
+          dif = Math.abs(dif); // Convert negative to positive
+        }
 
-        if (updatedSec !== Math.floor(statePlayed)) {
+        console.log("messages sub", updatedSec, Math.floor(statePlayed), dif);
+        if (dif > 3) {
           playerRef.current.seekTo(message.data.sec);
         }
       }
