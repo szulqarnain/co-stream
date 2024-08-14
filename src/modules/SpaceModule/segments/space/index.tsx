@@ -25,7 +25,7 @@ export default function Space() {
 
         console.log("messages sub", updatedSec, Math.floor(statePlayed), dif);
         if (dif > 3) {
-          playerRef.current.seekTo(message.data.sec);
+          playerRef.current.seekTo(message.data.sec + 0.7);
         }
       }
       if (message?.data?.pause) {
