@@ -15,6 +15,14 @@ export default function HomePage() {
         >
           Create Space
         </Link>
+
+        <Link
+          to="/user/stream"
+          className="py-4 border border-1 border-[white] text-white rounded-lg px-4 mb-4 sm:mb-[40px]"
+        >
+          Stream Screen
+        </Link>
+
         <button
           onClick={() => {
             signOut();

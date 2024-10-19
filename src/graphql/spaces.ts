@@ -25,6 +25,7 @@ export const GET_SPACE = gql`
       name
       sec
       pause
+      offer
       created_at
       updated_at
     }
@@ -49,6 +50,34 @@ export const INSERT = gql`
       returning {
         id
       }
+    }
+  }
+`;
+
+export const INSERT_WATCHER = gql`
+  mutation Add($data: [spaces_watcher_insert_input!]!) {
+    insert_spaces_watcher(objects: $data) {
+      affected_rows
+      returning {
+        id
+      }
+    }
+  }
+`;
+
+export const GET_SPACE_HANDSHAKE = gql`
+  subscription GetSpacesStreamingSubscription(
+    $space_id: uuid
+    $for_user: uuid
+  ) {
+    spaces_watcher(
+      where: { space_id: { _eq: $space_id }, for_user: { _eq: $for_user } }
+    ) {
+      id
+      handshake
+      user_id
+      created_at
+      updated_at
     }
   }
 `;

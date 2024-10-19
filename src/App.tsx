@@ -9,6 +9,9 @@ import Admin from "./Admin";
 import HomePage from "./pages/user/HomePage";
 import SpacePage from "./pages/user/SpacePage";
 import CreateSpacePage from "./pages/user/CreateSpacePage";
+import CreateStreamPage from "./pages/user/CreateStreamPage";
+import ShareScreenPage from "./pages/user/ShareScreenPage";
+import WatchPage from "./pages/user/WatchPage";
 
 // if (__DEV__) {
 // Adds messages only in a dev environment
@@ -24,7 +27,11 @@ function App() {
           <Route path="/user" element={<ProtectedRoute role="user" />}>
             <Route index element={<HomePage />} />
             <Route path="space/:id" element={<SpacePage />} />
+            <Route path="watch/:id" element={<WatchPage />} />
+            <Route path="share-screen/:id" element={<ShareScreenPage />} />
+
             <Route path="create" element={<CreateSpacePage />} />
+            <Route path="stream" element={<CreateStreamPage />} />
             {/* <Route path="channels" element={<HomePage />} />
             <Route path="create" element={<Admin />} /> */}
           </Route>
