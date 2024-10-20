@@ -128,8 +128,9 @@ const Watch = () => {
   }, [spaceData]);
 
   return (
-    <div>
-      <video ref={videoRef} autoPlay controls />
+      <div className="flex justify-center items-center flex-col pt-10">
+ 
+      <video ref={videoRef} autoPlay controls className="w-[550px]" />
     </div>
   );
 };
