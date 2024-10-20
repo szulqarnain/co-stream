@@ -18,6 +18,31 @@ const Watch = () => {
       for_user: "41fa8cb9-2c18-4874-b084-a0701a04fd60",
     },
   });
+
+  
+  // Listen for offer and handle when available
+  useEffect(() => {
+    if (data?.spaces_watcher?.length > 0 ) {
+      data?.spaces_watcher.map((watcher:any)=>{
+           const answer = watcher.handshake;
+           if (answer && answer.candidate) {
+                // This is an ICE candidate
+                console.log("Received ICE candidate:", answer);
+                try {
+                  await remotePeerConnection.current.addIceCandidate(
+                    new RTCIceCandidate(answer)
+                  );
+                } catch (error) {
+                  console.error("Error adding received ICE candidate", error);
+                }
+            } else {
+              console.error("Invalid answer or candidate received:", answer);
+            }
+      })
+    }
+  }, [data]);
+
+  
   const { data: spaceData } = useSubscription(GET_SPACE, {
     variables: { id },
   });
@@ -38,7 +63,7 @@ const Watch = () => {
           user_id: userId,
           handshake: event.candidate,
           space_id: id,
-          for_user: "41fa8cb9-2c18-4874-b084-a0701a04fd60", // For signaling purposes
+          for_user: "5d6ffb52-77e1-481d-820d-d586074bca5e", // For signaling purposes
         };
 
         await insert({
