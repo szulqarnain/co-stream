@@ -57,6 +57,7 @@ const Watch = () => {
   const videoRef: any = useRef(null);
 
   useEffect(() => {
+    if(space){
     // Create remote peer connection
     remotePeerConnection.current = new RTCPeerConnection();
 
@@ -91,6 +92,7 @@ const Watch = () => {
     return () => {
       remotePeerConnection.current.close();
     };
+    }
   }, []);
 
   // Function to handle receiving the offer from Stream component
