@@ -12,10 +12,11 @@ const Watch = () => {
   const { id }: any = useParams();
   const userId = useUserId();
   const [insert] = useMutation(INSERT_WATCHER);
+  const [space,setSpace] = useState(null); 
   const { data } = useSubscription(GET_SPACE_HANDSHAKE, {
     variables: {
       space_id: id,
-      for_user: "41fa8cb9-2c18-4874-b084-a0701a04fd60",
+      for_user: userId,
     },
   });
 
@@ -68,7 +69,7 @@ const Watch = () => {
           user_id: userId,
           handshake: event.candidate,
           space_id: id,
-          for_user: "5d6ffb52-77e1-481d-820d-d586074bca5e", // For signaling purposes
+          for_user: space.user_id, // For signaling purposes
         };
 
         await insert({
@@ -121,6 +122,7 @@ const Watch = () => {
   // Listen for offer and handle when available
   useEffect(() => {
     if (spaceData?.spaces?.length > 0 && spaceData.spaces[0].offer) {
+      setSpace(spaceData.spaces[0]);
       handleOffer(spaceData.spaces[0].offer, spaceData.spaces[0].user_id);
     }
   }, [spaceData]);
