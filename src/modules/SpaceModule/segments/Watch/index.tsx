@@ -28,19 +28,24 @@ const Watch = () => {
            if (answer && answer.candidate) {
                 // This is an ICE candidate
                 console.log("Received ICE candidate:", answer);
-                try {
-                  await remotePeerConnection.current.addIceCandidate(
-                    new RTCIceCandidate(answer)
-                  );
-                } catch (error) {
-                  console.error("Error adding received ICE candidate", error);
-                }
+                updateCandidate(answer);
             } else {
               console.error("Invalid answer or candidate received:", answer);
             }
       })
     }
   }, [data]);
+
+  const updateCandidate = async (answer:any)=>{
+
+        try {
+                  await remotePeerConnection.current.addIceCandidate(
+                    new RTCIceCandidate(answer)
+                  );
+                } catch (error) {
+                  console.error("Error adding received ICE candidate", error);
+                }
+  }
 
   
   const { data: spaceData } = useSubscription(GET_SPACE, {
