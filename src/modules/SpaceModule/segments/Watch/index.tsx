@@ -70,7 +70,7 @@ const Watch = () => {
           user_id: userId,
           handshake: event.candidate,
           space_id: id,
-          for_user: space.user_id, // For signaling purposes
+          for_user: space, // For signaling purposes
         };
 
         await insert({
@@ -124,7 +124,7 @@ const Watch = () => {
   // Listen for offer and handle when available
   useEffect(() => {
     if (spaceData?.spaces?.length > 0 && spaceData.spaces[0].offer) {
-      setSpace(spaceData.spaces[0]);
+      setSpace(spaceData.spaces[0].user_id);
       handleOffer(spaceData.spaces[0].offer, spaceData.spaces[0].user_id);
     }
   }, [spaceData]);
