@@ -12,9 +12,9 @@ const Stream = () => {
   const { id }: any = useParams();
   const userId = useUserId();
   const videoRef: any = useRef(null);
-  const localPeerConnection: any = useRef(null);
   const [update] = useMutation(UPDATE_MUTATION);
   const [insert] = useMutation(INSERT_WATCHER);
+  const localPeerConnections = useRef(new Map());
 
   // Subscribe to answers
   const { data } = useSubscription(GET_SPACE_HANDSHAKE, {
@@ -24,101 +24,184 @@ const Stream = () => {
     },
   });
 
+  const findOffer = (user_id: any, data: any) => {
+    return data.some(
+      (singleData: any) =>
+        singleData.user_id === user_id && singleData.reason === "offer"
+    );
+  };
+
+  const findICE = (user_id: any, data: any) => {
+    return data.some(
+      (singleData: any) =>
+        singleData.user_id === user_id && singleData.reason === "ice"
+    );
+  };
+
   // Handle the received answer from Watch component
   useEffect(() => {
     if (data?.spaces_watcher.length > 0) {
-      data?.spaces_watcher.forEach((watcher: any) => {
-        console.log("answer.received", watcher?.handshake);
-        if (watcher.handshake) handleReceivedAnswer(watcher?.handshake);
+      data.spaces_watcher.forEach((watcher: any) => {
+        if (
+          watcher.reason === "req_offer" &&
+          !findOffer(watcher.user_id, data.spaces_watcher)
+        ) {
+          sendStreamOffer(watcher.user_id);
+        }
+        if (
+          watcher.reason === "answer" &&
+          !findICE(watcher.user_id, data.spaces_watcher)
+        ) {
+          handleReceivedAnswer(watcher.data, watcher.user_id);
+        }
+        if (watcher.reason === "ice") {
+          handleReceivedIceCandidate(watcher.data, watcher.user_id);
+        }
       });
     }
   }, [data]);
 
-  useEffect(() => {
-    // Create local peer connection
-    localPeerConnection.current = new RTCPeerConnection();
+  const sendStreamOffer = async (remoteUserId: any) => {
+    const peerConnection = createPeerConnection(remoteUserId);
 
-    // Handle ICE candidates
-    localPeerConnection.current.onicecandidate = async (event: any) => {
-      if (event.candidate) {
-        console.log("candidate create", event.candidate);
-        let payload: any = {
-          user_id: userId,
-          handshake: event.candidate,
-          space_id: id,
-          for_user: "41fa8cb9-2c18-4874-b084-a0701a04fd60",
-        };
+    const offer = await peerConnection.createOffer();
+    await peerConnection.setLocalDescription(offer);
 
-        await insert({
-          variables: {
-            data: [payload],
+    await insert({
+      variables: {
+        data: [
+          {
+            user_id: userId,
+            data: offer,
+            space_id: id,
+            for_user: remoteUserId,
+            reason: "offer",
           },
-        });
-        console.log("candidate sent", event.candidate);
-      }
-    };
+        ],
+      },
+    });
 
-    return () => {
-      localPeerConnection.current.close();
-    };
-  }, []);
+    console.log("Offer sent to user:", remoteUserId, offer);
+  };
 
   const startStreaming = async () => {
-    // Get local media stream (screen or webcam)
     const stream = await navigator.mediaDevices.getDisplayMedia({
       video: true,
     });
 
-    // Display local stream
     videoRef.current.srcObject = stream;
 
-    // Add local stream tracks to peer connection
     stream.getTracks().forEach((track) => {
-      localPeerConnection.current.addTrack(track, stream);
+      localPeerConnections.current.forEach((pc) => {
+        pc.addTrack(track, stream);
+      });
+    });
+  };
+
+  const createPeerConnection = (remoteUserId: any) => {
+    console.log(`Creating peer connection for remote user: ${remoteUserId}`);
+    const localPeerConnection = new RTCPeerConnection({
+      iceServers: [
+        { urls: "stun:stun.l.google.com:19302" },
+        { urls: "stun:stun1.l.google.com:19302" },
+      ],
     });
 
-    // Create and set offer
-    const offer = await localPeerConnection.current.createOffer();
-    await localPeerConnection.current.setLocalDescription(offer);
+    localPeerConnection.onicecandidate = async (event) => {
+      if (event.candidate) {
+        console.log("New ICE candidate generated:", event.candidate);
+        // await insert({
+        //   variables: {
+        //     data: [
+        //       {
+        //         user_id: userId,
+        //         data: event.candidate,
+        //         space_id: id,
+        //         reason: "ice",
+        //         for_user: remoteUserId,
+        //       },
+        //     ],
+        //   },
+        // });
+        console.log("Candidate sent for user:", remoteUserId, event.candidate);
+      }
+    };
 
-    // Send offer to the server
-    await update({
-      variables: {
-        data: { offer },
-        id,
-      },
-    });
+    localPeerConnection.oniceconnectionstatechange = () => {
+      console.log(
+        `ICE connection state for ${remoteUserId}:`,
+        localPeerConnection.iceConnectionState
+      );
+      // setConnectionState(localPeerConnection.iceConnectionState);
+    };
 
-    console.log("offer.sent", offer);
+    localPeerConnection.onconnectionstatechange = () => {
+      console.log(
+        `Connection state for ${remoteUserId}:`,
+        localPeerConnection.connectionState
+      );
+    };
+
+    // Store this connection
+    localPeerConnections.current.set(remoteUserId, localPeerConnection);
+
+    return localPeerConnection;
   };
 
   // Handle the received answer from the Watch component
-  const handleReceivedAnswer = async (answer: any) => {
+  const handleReceivedAnswer = async (answer: any, remoteUserId: any) => {
+    const peerConnection = localPeerConnections.current.get(remoteUserId);
+
+    if (!peerConnection) {
+      console.log("Creating a new peer connection for user:", remoteUserId);
+      createPeerConnection(remoteUserId);
+    }
+
     if (answer && answer.sdp && answer.type) {
-      // This is an SDP answer
-      console.log("Received valid SDP answer:", answer);
-      await localPeerConnection.current.setRemoteDescription(
-        new RTCSessionDescription(answer)
-      );
-    } else if (answer && answer.candidate) {
-      // This is an ICE candidate
-      console.log("Received ICE candidate:", answer);
       try {
-        await localPeerConnection.current.addIceCandidate(
-          new RTCIceCandidate(answer)
+        await peerConnection.setRemoteDescription(
+          new RTCSessionDescription(answer)
         );
+        console.log("Remote description set for user:", remoteUserId);
       } catch (error) {
-        console.error("Error adding received ICE candidate", error);
+        console.error("Error setting remote description:", error);
       }
-    } else {
-      console.error("Invalid answer or candidate received:", answer);
     }
   };
 
+  // Handle received ICE candidates
+
+  // Update handleReceivedIceCandidate function
+  const handleReceivedIceCandidate = async (
+    candidate: any,
+    remoteUserId: any
+  ) => {
+    const peerConnection = localPeerConnections.current.get(remoteUserId);
+
+    if (peerConnection && candidate) {
+      try {
+        await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+        console.log("ICE candidate added for user:", remoteUserId);
+      } catch (error) {
+        console.error("Error adding received ICE candidate:", error);
+      }
+    }
+  };
+  const Check = () => {
+    console.log(
+      localPeerConnections.current.values().next().value?.iceConnectionState
+    );
+  };
   return (
-    <div>
-      <button onClick={startStreaming}>Start Streaming</button>
-      <video ref={videoRef} autoPlay controls />
+    <div className="gap-10 flex justify-center items-center flex-col pt-10">
+      <button
+        onClick={startStreaming}
+        className="py-4 border border-1 border-[white] text-white rounded-lg px-4 mb-4 sm:mb-[40px]"
+      >
+        Start Streaming
+      </button>
+      <button onClick={() => Check()}>check</button>
+      <video ref={videoRef} autoPlay controls className="w-[550px]" />
     </div>
   );
 };

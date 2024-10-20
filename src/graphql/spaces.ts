@@ -25,9 +25,18 @@ export const GET_SPACE = gql`
       name
       sec
       pause
-      offer
       created_at
       updated_at
+      spaces_watchers {
+        user_id
+        updated_at
+        space_id
+        reason
+        id
+        for_user
+        data
+        created_at
+      }
     }
   }
 `;
@@ -74,8 +83,10 @@ export const GET_SPACE_HANDSHAKE = gql`
       where: { space_id: { _eq: $space_id }, for_user: { _eq: $for_user } }
     ) {
       id
-      handshake
+      data
       user_id
+      for_user
+      reason
       created_at
       updated_at
     }

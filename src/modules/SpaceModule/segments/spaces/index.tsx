@@ -21,7 +21,6 @@ export default function Spaces() {
         </div>
         {loading ? (
           <>
-            {" "}
             <h1 className="text-white font-bold">My Spaces:</h1>
             <Loading />
             <h1 className="text-white font-bold">Public Spaces:</h1>

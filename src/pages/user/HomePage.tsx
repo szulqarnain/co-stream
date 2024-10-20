@@ -20,7 +20,7 @@ export default function HomePage() {
           to="/user/stream"
           className="py-4 border border-1 border-[white] text-white rounded-lg px-4 mb-4 sm:mb-[40px]"
         >
-          Stream Screen
+          Screen Share
         </Link>
 
         <button
