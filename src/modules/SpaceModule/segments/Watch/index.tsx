@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef,useState, useEffect } from "react";
 import { useMutation, useSubscription } from "@apollo/client";
 import {
   GET_SPACE_HANDSHAKE,
@@ -12,7 +12,7 @@ const Watch = () => {
   const { id }: any = useParams();
   const userId = useUserId();
   const [insert] = useMutation(INSERT_WATCHER);
-  const [space,setSpace] = useState(null); 
+  const [space, setSpace] = useState<any>(null); 
   const { data } = useSubscription(GET_SPACE_HANDSHAKE, {
     variables: {
       space_id: id,
