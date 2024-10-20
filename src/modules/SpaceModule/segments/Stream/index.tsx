@@ -116,9 +116,14 @@ const Stream = () => {
   };
 
   return (
-    <div>
-      <button onClick={startStreaming}>Start Streaming</button>
-      <video ref={videoRef} autoPlay controls />
+    <div className="gap-10 flex justify-center items-center flex-col pt-10">
+      <button
+        onClick={startStreaming}
+        className="py-4 border border-1 border-[white] text-white rounded-lg px-4 mb-4 sm:mb-[40px]"
+      >
+        Start Streaming
+      </button>
+      <video ref={videoRef} autoPlay controls className="w-[550px]" />
     </div>
   );
 };
