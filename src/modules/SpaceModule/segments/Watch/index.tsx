@@ -16,7 +16,7 @@ const Watch = () => {
   const { data } = useSubscription(GET_SPACE_HANDSHAKE, {
     variables: {
       space_id: id,
-      for_user: userId,
+      for_user: "41fa8cb9-2c18-4874-b084-a0701a04fd60",
     },
   });
 
@@ -57,7 +57,7 @@ const Watch = () => {
   const videoRef: any = useRef(null);
 
   useEffect(() => {
-    if(space){
+
     // Create remote peer connection
     remotePeerConnection.current = new RTCPeerConnection();
 
@@ -92,7 +92,7 @@ const Watch = () => {
     return () => {
       remotePeerConnection.current.close();
     };
-    }
+
   }, []);
 
   // Function to handle receiving the offer from Stream component
