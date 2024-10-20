@@ -70,7 +70,7 @@ const Watch = () => {
           user_id: userId,
           handshake: event.candidate,
           space_id: id,
-          for_user: space, // For signaling purposes
+          for_user: "5d6ffb52-77e1-481d-820d-d586074bca5e", // For signaling purposes
         };
 
         await insert({
