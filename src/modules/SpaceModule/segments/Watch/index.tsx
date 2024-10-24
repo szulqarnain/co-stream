@@ -20,9 +20,66 @@ const Watch = ({ for__user }: any) => {
     },
   });
 
-  console.log("s", error, data);
+  // Ref to store ICE candidates queue
+  const iceCandidateQueue = useRef<any[]>([]);
 
-  // Listen for offer and handle when available
+  // Track if remote description is set
+  const [remoteDescriptionSet, setRemoteDescriptionSet] = useState(false);
+
+  const remotePeerConnection: any = useRef(null);
+  const videoRef: any = useRef(null);
+
+  // Function to handle receiving the offer from Stream component
+  const handleOffer = async (offer: any, for_user: any) => {
+    console.log("offer.received", offer, for_user);
+    if (offer && offer.sdp && offer.type === "offer") {
+      await remotePeerConnection.current.setRemoteDescription(
+        new RTCSessionDescription(offer)
+      );
+      setRemoteDescriptionSet(true);
+
+      // Apply any ICE candidates in the queue
+      while (iceCandidateQueue.current.length > 0) {
+        const candidate = iceCandidateQueue.current.shift();
+        await remotePeerConnection.current.addIceCandidate(
+          new RTCIceCandidate(candidate)
+        );
+      }
+
+      // Create an answer and set it locally
+      const answer = await remotePeerConnection.current.createAnswer();
+      await remotePeerConnection.current.setLocalDescription(answer);
+
+      // Send answer back to Stream component via the signaling server
+      await insert({
+        variables: {
+          data: [
+            { user_id: userId, handshake: answer, space_id: id, for_user },
+          ],
+        },
+      });
+      console.log("answer.sent", answer);
+    } else {
+      console.error("Invalid offer received:", offer);
+    }
+  };
+
+  // Function to handle ICE candidates
+  const updateCandidate = async (answer: any) => {
+    try {
+      if (remoteDescriptionSet) {
+        await remotePeerConnection.current.addIceCandidate(
+          new RTCIceCandidate(answer)
+        );
+      } else {
+        // Queue the ICE candidate until the remote description is set
+        iceCandidateQueue.current.push(answer);
+      }
+    } catch (error) {
+      console.error("Error adding received ICE candidate", error);
+    }
+  };
+
   useEffect(() => {
     if (data?.spaces_watcher?.length > 0) {
       data?.spaces_watcher.map((watcher: any) => {
@@ -38,23 +95,6 @@ const Watch = ({ for__user }: any) => {
       });
     }
   }, [data]);
-
-  const updateCandidate = async (answer: any) => {
-    try {
-      await remotePeerConnection.current.addIceCandidate(
-        new RTCIceCandidate(answer)
-      );
-    } catch (error) {
-      console.error("Error adding received ICE candidate", error);
-    }
-  };
-
-  const { data: spaceData } = useSubscription(GET_SPACE, {
-    variables: { id },
-  });
-
-  const remotePeerConnection: any = useRef(null);
-  const videoRef: any = useRef(null);
 
   useEffect(() => {
     // Create remote peer connection
@@ -93,33 +133,10 @@ const Watch = ({ for__user }: any) => {
     };
   }, []);
 
-  // Function to handle receiving the offer from Stream component
-  const handleOffer = async (offer: any, for_user: any) => {
-    console.log("offer.received", offer, for_user);
-    if (offer && offer.sdp && offer.type === "offer") {
-      await remotePeerConnection.current.setRemoteDescription(
-        new RTCSessionDescription(offer)
-      );
+  const { data: spaceData } = useSubscription(GET_SPACE, {
+    variables: { id },
+  });
 
-      // Create an answer and set it locally
-      const answer = await remotePeerConnection.current.createAnswer();
-      await remotePeerConnection.current.setLocalDescription(answer);
-
-      // Send answer back to Stream component via the signaling server
-      await insert({
-        variables: {
-          data: [
-            { user_id: userId, handshake: answer, space_id: id, for_user },
-          ],
-        },
-      });
-      console.log("answer.sent", answer);
-    } else {
-      console.error("Invalid offer received:", offer);
-    }
-  };
-
-  // Listen for offer and handle when available
   useEffect(() => {
     if (spaceData?.spaces?.length > 0 && spaceData.spaces[0].offer) {
       setSpace(spaceData.spaces[0].user_id);
