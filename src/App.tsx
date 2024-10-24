@@ -28,7 +28,10 @@ function App() {
             <Route index element={<HomePage />} />
             <Route path="space/:id" element={<SpacePage />} />
             <Route path="watch/:id" element={<WatchPage />} />
-            <Route path="share-screen/:id" element={<ShareScreenPage />} />
+            <Route
+              path="share-screen/:id/:for__user"
+              element={<ShareScreenPage />}
+            />
 
             <Route path="create" element={<CreateSpacePage />} />
             <Route path="stream" element={<CreateStreamPage />} />

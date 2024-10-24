@@ -1,4 +1,4 @@
-import React, { useRef,useState, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useMutation, useSubscription } from "@apollo/client";
 import {
   GET_SPACE_HANDSHAKE,
@@ -8,47 +8,40 @@ import {
 import { useUserId } from "@nhost/react";
 import { useParams } from "react-router-dom";
 
-const Watch = () => {
+const Watch = ({ for__user }: any) => {
   const { id }: any = useParams();
   const userId = useUserId();
   const [insert] = useMutation(INSERT_WATCHER);
-  const [space, setSpace] = useState<any>(null); 
+  const [space, setSpace] = useState<any>(null);
   const { data } = useSubscription(GET_SPACE_HANDSHAKE, {
     variables: {
       space_id: id,
-      for_user: "41fa8cb9-2c18-4874-b084-a0701a04fd60",
+      for_user: userId,
     },
   });
 
-  
   // Listen for offer and handle when available
   useEffect(() => {
-    if (data?.spaces_watcher?.length > 0 ) {
-      data?.spaces_watcher.map((watcher:any)=>{
-           const answer = watcher.handshake;
-           if (answer && answer.candidate) {
-                // This is an ICE candidate
-                console.log("Received ICE candidate:", answer);
-                updateCandidate(answer);
-            } else {
-              console.error("Invalid answer or candidate received:", answer);
-            }
-      })
+    if (data?.spaces_watcher?.length > 0) {
+      data?.spaces_watcher.map((watcher: any) => {
+        const answer = watcher.handshake;
+        // console.log("answer");
+        console.log("Received ICE candidate:", answer);
+        updateCandidate(answer);
+      });
     }
   }, [data]);
 
-  const updateCandidate = async (answer:any)=>{
+  const updateCandidate = async (answer: any) => {
+    try {
+      await remotePeerConnection.current.addIceCandidate(
+        new RTCIceCandidate(answer.handshake)
+      );
+    } catch (error) {
+      console.error("Error adding received ICE candidate", error);
+    }
+  };
 
-        try {
-                  await remotePeerConnection.current.addIceCandidate(
-                    new RTCIceCandidate(answer)
-                  );
-                } catch (error) {
-                  console.error("Error adding received ICE candidate", error);
-                }
-  }
-
-  
   const { data: spaceData } = useSubscription(GET_SPACE, {
     variables: { id },
   });
@@ -57,20 +50,19 @@ const Watch = () => {
   const videoRef: any = useRef(null);
 
   useEffect(() => {
-
     // Create remote peer connection
     remotePeerConnection.current = new RTCPeerConnection();
 
     // Handle ICE candidates received from Stream component
     remotePeerConnection.current.onicecandidate = async (event: any) => {
       if (event.candidate) {
-        console.log("candidate received", event.candidate);
+        console.log("candidate created", event.candidate);
         // Send ICE candidate back to the signaling server
         let payload: any = {
           user_id: userId,
           handshake: event.candidate,
           space_id: id,
-          for_user: "5d6ffb52-77e1-481d-820d-d586074bca5e", // For signaling purposes
+          for_user: for__user, // For signaling purposes
         };
 
         await insert({
@@ -92,7 +84,6 @@ const Watch = () => {
     return () => {
       remotePeerConnection.current.close();
     };
-
   }, []);
 
   // Function to handle receiving the offer from Stream component
@@ -130,8 +121,7 @@ const Watch = () => {
   }, [spaceData]);
 
   return (
-      <div className="flex justify-center items-center flex-col pt-10">
- 
+    <div className="flex justify-center items-center flex-col pt-10">
       <video ref={videoRef} autoPlay controls className="w-[550px]" />
     </div>
   );

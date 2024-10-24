@@ -9,12 +9,13 @@ import {
 } from "~/graphql/spaces";
 
 const Stream = () => {
-  const { id }: any = useParams();
+  const { id, for__user }: any = useParams();
   const userId = useUserId();
   const videoRef: any = useRef(null);
   const localPeerConnection: any = useRef(null);
   const [update] = useMutation(UPDATE_MUTATION);
   const [insert] = useMutation(INSERT_WATCHER);
+  // const for__user = "41fa8cb9-2c18-4874-b084-a0701a04fd60";
 
   // Subscribe to answers
   const { data } = useSubscription(GET_SPACE_HANDSHAKE, {
@@ -46,7 +47,7 @@ const Stream = () => {
           user_id: userId,
           handshake: event.candidate,
           space_id: id,
-          for_user: "41fa8cb9-2c18-4874-b084-a0701a04fd60",
+          for_user: for__user,
         };
 
         await insert({
