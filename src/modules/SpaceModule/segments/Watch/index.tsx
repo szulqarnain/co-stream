@@ -13,21 +13,28 @@ const Watch = ({ for__user }: any) => {
   const userId = useUserId();
   const [insert] = useMutation(INSERT_WATCHER);
   const [space, setSpace] = useState<any>(null);
-  const { data } = useSubscription(GET_SPACE_HANDSHAKE, {
+  const { data, error } = useSubscription(GET_SPACE_HANDSHAKE, {
     variables: {
       space_id: id,
       for_user: userId,
     },
   });
 
+  console.log("s", error, data);
+
   // Listen for offer and handle when available
   useEffect(() => {
     if (data?.spaces_watcher?.length > 0) {
       data?.spaces_watcher.map((watcher: any) => {
         const answer = watcher.handshake;
-        // console.log("answer");
-        console.log("Received ICE candidate:", answer);
-        updateCandidate(answer);
+        console.log("answer");
+        if (answer && answer.candidate) {
+          // This is an ICE candidate
+          console.log("Received ICE candidate:", answer);
+          updateCandidate(answer);
+        } else {
+          console.error("Invalid answer or candidate received:", answer);
+        }
       });
     }
   }, [data]);
@@ -35,7 +42,7 @@ const Watch = ({ for__user }: any) => {
   const updateCandidate = async (answer: any) => {
     try {
       await remotePeerConnection.current.addIceCandidate(
-        new RTCIceCandidate(answer.handshake)
+        new RTCIceCandidate(answer)
       );
     } catch (error) {
       console.error("Error adding received ICE candidate", error);
